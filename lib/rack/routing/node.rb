@@ -128,7 +128,7 @@ module Rack
       def recognize_in_children(state, check_route)
         node = self
         path = state.remaining_path
-        while path.any?
+        while !path.empty?
           md = PART_RE.match(path)
           break unless md
           part = md[0]
@@ -339,7 +339,7 @@ module Rack
       end
 
       def optimize_root
-        return if root.str.any?
+        return unless root.str.empty?
         return unless root.str_children.size + root.children.size == 1
         self.root = root.str_children.values.first || root.children.first
       end

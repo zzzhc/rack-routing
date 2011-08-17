@@ -58,7 +58,7 @@ module Rack
         query_string = params.map do |k, v|
           "#{CGI.escape(k.to_s)}=#{CGI.escape(v.to_s)}"
         end.join(AMP_STR)
-        path << QM_STR << query_string if query_string.any?
+        path << QM_STR << query_string unless query_string.empty?
         path
       end
 

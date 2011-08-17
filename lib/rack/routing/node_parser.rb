@@ -59,7 +59,7 @@ module Rack
         remaining = path[root.str.size..-1]
         current_node = root
 
-        while remaining.any? && (m = NEXT_RE.match(remaining))
+        while !remaining.empty? && (m = NEXT_RE.match(remaining))
           remaining = m.post_match
           end_with_slash = m[0][-1] == SLASH_CHAR
 					node =
@@ -87,7 +87,7 @@ module Rack
 					current_node = current_node.add_node(node)
 				end
 
-				raise InvalidPathError, "path: #{path}, remaining: #{remaining}" if remaining.any?
+				raise InvalidPathError, "path: #{path}, remaining: #{remaining}" unless remaining.empty?
 				current_node
 			end
 
