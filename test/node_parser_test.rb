@@ -1,8 +1,9 @@
 require File.expand_path("../abstract_unit", __FILE__)
 
-class RecognizeTest < RoutingTestCase
+class NodeParserTest < RoutingTestCase
 
   def setup
+    super
     @parser = NodeParser.new
     @root = RootNode.new("/")
   end

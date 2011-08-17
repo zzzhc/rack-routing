@@ -1,7 +1,5 @@
 require 'rubygems'
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
-require 'rack'
-require 'rack/mock'
 require 'rack/routing'
 require 'test/unit'
 
