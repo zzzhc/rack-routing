@@ -1,0 +1,14 @@
+																								root               /(.:format)  {:action=>"index", :controller=>"root"}
+                                               user_company GET    /users/:id/company {:action => "company", :controller => "users"}
+                                                            POST   /users/:user_id/company {:action => "create_company", :controller => "users"}
+                                           search_companies GET    /advertising/companies/search(.:format)                                                                                        {:action=>"search", :controller=>"network/advertising/company"}
+                                                  companies GET    /advertising/companies(.:format)                                                                                               {:action=>"index", :controller=>"network/advertising/company"}
+                                                            POST   /advertising/companies(.:format)                                                                                               {:action=>"create", :controller=>"network/advertising/company"}
+                                                new_company GET    /advertising/companies/new(.:format)                                                                                           {:action=>"new", :controller=>"network/advertising/company"}
+                                               edit_company GET    /advertising/companies/:id/edit(.:format)                                                                                      {:action=>"edit", :controller=>"network/advertising/company"}
+                                                    company GET    /advertising/companies/:id(.:format)                                                                                           {:action=>"show", :controller=>"network/advertising/company"}
+                                                            PUT    /advertising/companies/:id(.:format)                                                                                           {:action=>"update", :controller=>"network/advertising/company"}
+                                                            DELETE /advertising/companies/:id(.:format)                                                                                           {:action=>"destroy", :controller=>"network/advertising/company"}
+
+																							  locale_user GET    /(:locale/)users(.:format)   {:action => "index", :controller => "users"}
+                                                                   /:controller(/:action(/:id(.:format)))

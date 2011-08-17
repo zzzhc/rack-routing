@@ -1,0 +1,106 @@
+$has_gnome_notify = system("which notify-send >/dev/null")
+$growlNotify = system("growlnotify -v >/dev/null 2>&1")
+
+def notify_send(status, title, body)
+  image_root = "#{File.dirname(__FILE__)}/.autotest_images"
+  image_file = File.expand_path("#{image_root}/#{status}.png")
+  cmd = "notify-send -i '#{image_file}' -t 4500 '#{title}' '#{body}'"
+  system(cmd)
+end
+
+def notify(results)
+  return unless $has_gnome_notify
+  last_line = results.last
+
+  unless last_line.nil?
+    output = last_line[/(\d+)\s+tests?,\s+\d+ assertions,\s+(\d+)\s+failures?(,\s*(\d+)\s+errors?)?/]
+    if output
+      tests = $1.to_i
+      failures = $~[2].to_i || 0
+      errors = $~[4].to_i || 0
+    else
+      notify_send(:fail, "unknown error", results.first || "")
+      return
+    end
+
+    if failures > 0
+      notify_send(:fail, "Tests Failed", output)
+    elsif errors > 0
+      notify_send(:error, "Tests Error", output)
+    else
+      notify_send(:pass, "#{tests} tests Passed", output)
+    end
+  end
+end
+
+# This works on MAC with growlnotify
+def growl(title, msg, opt = {})
+  cmd =  "growlnotify -n autotest --image #{opt[:image]}#{opt[:priority] && " -p #{opt[:priority]} "} -m #{msg.inspect} #{title} #{opt[:stick]}"
+  system cmd
+end
+
+def growl_notify(file, lines)
+  image_root = "#{File.dirname(__FILE__)}/.autotest_images"
+  success_opt = {
+    :image => "#{image_root}/pass.png",
+  }
+
+  pending_opt = {
+    :image => "#{image_root}/pending.png",
+  }
+
+  failure_opt = {
+    :image => "#{image_root}/fail.png",
+    :priority   => 2,
+  }
+  time_cost, result = nil, nil
+  lines.each_with_index do |line, i|
+    next unless line =~ /^Finished/
+    time_cost = line.chomp
+    result = lines[i+1]
+    break
+  end
+  if result
+    output = result[/(\d+)\s+examples?,\s*(\d+)\s+failures?(,\s*(\d+)\s+pending)?/]
+    if output
+      examples = $1.to_i
+      failures = $~[2].to_i || 0
+      pending = $~[4].to_i || 0
+    else
+      growl("UNKNOWN ERROR", file + " " + (lines.first || ""), failure_opt)
+      return
+    end
+
+    if failures > 0
+      growl("#{failures} of #{examples} Fail!", "#{time_cost}(#{file})", failure_opt)
+    # elsif pending > 0
+      # growl("#{pending} of #{examples} Pending...", file, pending_opt)
+    else
+      growl("#{examples - pending} of #{examples} Passed! #{pending > 0 ? "#{pending} Pending" : ""}", "#{time_cost}(#{file})", success_opt)
+    end
+  end
+end
+
+def run_test(*tests)
+  puts "run #{tests.inspect}"
+  pid = fork do
+    require 'open3'
+    Open3.popen3("ruby", *tests) do |stdin, stdout, stderr|
+      output = stdout.readlines
+      puts output.join
+      puts stderr.readlines.join
+      notify(output)
+    end
+  end
+  Process.detach pid
+end
+
+watch('lib/(.*).rb$') do |md|
+	run_test *Dir["test/*_test.rb"]
+end
+
+watch('test/(.*_test).rb$') do |md|
+  run_test("test/#{md[1]}.rb")
+end
+
+# vim: ft=ruby
