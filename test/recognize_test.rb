@@ -6,7 +6,6 @@ class RecognizeTest < RoutingTestCase
 	def setup
 		super
 		@routes = load_fixture(PathApp, "r1.txt")
-    @routes.root.write_graph("tmp/1.svg")
 	end
 
 	def test_recognize

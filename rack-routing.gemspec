@@ -11,5 +11,8 @@ Gem::Specification.new do |s|
 	s.summary = %q{rack routing}
   s.description = %q{A fast, little memory footprint rack routing implementation}
   s.test_files = `git ls-files test`.split("\n")
+
+  s.add_development_dependency 'rack'
+  s.add_development_dependency 'ruby-graphviz'
 end
 
